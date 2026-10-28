@@ -1,0 +1,46 @@
+name: Build and release Windows executable
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-2022
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S . -B build -A x64
+      - name: Build
+        run: cmake --build build --config Release --parallel 2
+      - name: Test
+        run: ctest --test-dir build -C Release --output-on-failure
+      - name: Package
+        shell: pwsh
+        run: |
+          cmake --install build --config Release --prefix package/WTArmourVision
+          if ($LASTEXITCODE) { throw "Install failed" }
+          Copy-Item package/WTArmourVision/WTArmourVision.exe WTArmourVision.exe
+          Compress-Archive package/WTArmourVision/* WTArmourVision-Windows-x64.zip
+          Get-FileHash WTArmourVision.exe -Algorithm SHA256 | Format-List | Out-File SHA256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: WTArmourVision-Windows-x64
+          path: |
+            WTArmourVision.exe
+            WTArmourVision-Windows-x64.zip
+            SHA256.txt
+      - name: Publish GitHub release
+        if: github.event_name != 'pull_request'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "build-${{ github.run_number }}-${{ github.run_attempt }}"
+          gh release create $tag WTArmourVision.exe WTArmourVision-Windows-x64.zip SHA256.txt --target '${{ github.sha }}' --title "WT Armour Vision $tag" --notes-file docs/RELEASE_NOTES.md --latest
+          if ($LASTEXITCODE) { throw "Release publishing failed" }
