@@ -1,10 +1,5 @@
-Interface redesign 0.4:
-- New native sidebar, typography, dark panels, status cards and clear session controls.
-- Dedicated armour studio, telemetry inspector, performance presets, overlay preview and searchable data library.
-- Profile settings now include reset confirmation.
-- Demo/live switches clear old telemetry immediately; obsolete worker results are rejected and stale readings are hidden.
-- Endpoint results appear independently rather than waiting for all three requests.
+Vehicle telemetry fix 0.4.1
 
-Download WTArmourVision.exe and double-click it. The embedded demo database requires no extra files. UI-preview.png shows the Windows interface. Windows automated tests render all seven pages, resize and shut down, and exercise corrupt-file recovery.
+The indicators endpoint is now polled first. Valid tank model IDs are preserved even when the inspector's field limit is reached. The dashboard and overlay show the reported vehicle even if /state fails. The user-supplied tankModels/sw_charioteer_mk_7 response is covered by regression tests and displayed as Charioteer Mk VII (Sweden). Unknown tank model IDs are displayed verbatim; they are not guessed. Stale or invalid identities are cleared.
 
-Real War Thunder compatibility remains unverified. No live armour detection, automatic ammunition selection, weakspot targeting or validated damage prediction is included. Bundled profiles are synthetic and labelled accordingly.
+Exit the previous app, launch this executable, and click Connect to game. Ammunition remains manual: the supplied response contains no selected-shell identifier or penetration table. This update does not add enemy armour highlighting or verified armour data.

@@ -73,3 +73,7 @@ Regression coverage includes failed settings loads/replacements, UTF-8 boundarie
 The native control centre now uses Segoe UI typography, a persistent sidebar, clear status cards, separate session controls, a telemetry inspector, selectable performance presets, and an armour studio with a grid-backed schematic and analysis panel. Overlay settings include a position preview; the profile page has reset confirmation; the data library has a searchable table. Existing connection, overlay, settings and database controls remain functional.
 
 Telemetry mode changes clear old data immediately, pending results from older modes are rejected, and data older than four seconds is marked stale. Each endpoint publishes independently so an unavailable map endpoint does not delay state display. The Windows smoke test renders every page. The release includes a captured UI preview.
+
+## Vehicle identification 0.4.1
+
+The user-supplied Charioteer indicators response is included as a regression fixture. Its reported model ID is mapped to a display label; this is not a verified armour profile. Vehicle identity is read from the complete indicators JSON before limiting inspector rows. `/state` failure does not prevent identifying the vehicle. No selected ammunition identifier was present in the supplied response; `first_stage_ammo: -1` is not interpreted as a shell type.

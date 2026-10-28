@@ -1,1 +1,1 @@
-6e1dd73d92cb2262116e4f500273ae175bcb35405d5573f021c28321ce77fda4  downloads/WTArmourVision.exe
+4731c0c666421a06da73f4d621c80e473a93c841271b98500198bb208bf1c183  downloads/WTArmourVision.exe

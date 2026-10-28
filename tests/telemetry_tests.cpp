@@ -1,6 +1,6 @@
 #include "telemetry.hpp"
 #include <iostream>
-int main(){int n=0;auto check=[&](bool v){if(!v)throw std::runtime_error("check "+std::to_string(n+1));++n;};try{
+int main(int argc,char**argv){int n=0;auto check=[&](bool v){if(!v)throw std::runtime_error("check "+std::to_string(n+1));++n;};try{
  auto e=wt::parseEndpoint(R"({"valid":true,"speed, km/h":42,"RPM":1800})");check(e.received&&e.valid==true);check(e.fields.size()==2);check(e.fields[1].first=="speed, km/h");check(e.fields[1].second=="42");
  e=wt::parseEndpoint(R"({"valid":false,"speed":999})");check(e.received&&e.valid==false);check(e.fields.empty());
  e=wt::parseEndpoint(R"({"valid":"true","speed":99})");check(!e.valid&&e.fields.empty());
@@ -15,5 +15,11 @@ int main(){int n=0;auto check=[&](bool v){if(!v)throw std::runtime_error("check 
  channel.setMode(false);check(!channel.read().connected());check(!channel.publish(demoRequest,sample));auto liveRequest=channel.request();
  channel.setMode(true);channel.setMode(false);check(!channel.publish(liveRequest,sample));liveRequest=channel.request();check(channel.publish(liveRequest,sample));check(!channel.read().simulated);
  auto stale=channel.read(sample.state.sampledAt+std::chrono::seconds(5));check(!stale.connected());check(stale.state.fields.empty());check(!stale.state.valid);check(channel.read(sample.state.sampledAt+std::chrono::seconds(3)).connected());
+ if(argc!=2)throw std::runtime_error("Expected recorded indicators fixture");std::ifstream fixture(argv[1]);auto fixtureJson=wt::json::parse(fixture);
+ wt::TelemetrySnapshot tank;tank.state.status="HTTP 404";tank.indicators=wt::parseEndpoint(fixtureJson.dump());
+ check(tank.indicators.vehicleId=="tankModels/sw_charioteer_mk_7");check(tank.vehicle()=="Charioteer Mk VII (Sweden)");check(tank.summary().find("Tank telemetry active")!=std::string::npos);check(tank.summary().find("optional")!=std::string::npos);
+ fixtureJson["valid"]=false;tank.indicators=wt::parseEndpoint(fixtureJson.dump());check(tank.vehicle()=="Unavailable");check(tank.indicators.vehicleId.empty());
+ fixtureJson["valid"]=true;fixtureJson["type"]="tankModels/unknown_model";tank.indicators=wt::parseEndpoint(fixtureJson.dump());check(tank.vehicle()=="tankModels/unknown_model");tank.simulated=true;check(tank.vehicle()=="Unavailable in demo mode");tank.simulated=false;
+ wt::TelemetryChannel tankChannel;tankChannel.setMode(false);check(tankChannel.publish(tankChannel.request(),tank));check(tankChannel.read(tank.indicators.sampledAt+std::chrono::seconds(5)).vehicle()=="Unavailable");
  std::cout<<n<<" telemetry checks passed\n";return 0;
  }catch(const std::exception&e){std::cerr<<e.what()<<'\n';return 1;}}

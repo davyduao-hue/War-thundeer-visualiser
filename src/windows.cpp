@@ -64,8 +64,8 @@ void telemetryWorker(std::stop_token stop){while(!stop.stop_requested()){
  auto request=telemetryChannel.request();auto next=telemetryChannel.read();
  if(request.simulated){next.state=wt::parseEndpoint(R"JSON({"valid":true,"demo speed (fixture units)":24})JSON");if(!telemetryChannel.publish(request,next))continue;}
  else {
-  next.state=pollEndpoint(L"/state");if(stop.stop_requested())break;if(!telemetryChannel.publish(request,next))continue;
   next.indicators=pollEndpoint(L"/indicators");if(stop.stop_requested())break;if(!telemetryChannel.publish(request,next))continue;
+  next.state=pollEndpoint(L"/state");if(stop.stop_requested())break;if(!telemetryChannel.publish(request,next))continue;
   next.map=pollEndpoint(L"/map_info.json");if(stop.stop_requested())break;if(!telemetryChannel.publish(request,next))continue;
  }
  int delay=(!request.simulated&&!next.connected())?1500:interval.load();
@@ -81,8 +81,8 @@ BOOL CALLBACK listWindows(HWND h,LPARAM){
 }
 void exportDiagnostics(){try{
  auto current=telemetryChannel.read();
- wt::json report={{"version","0.4"},{"demo",settings.demo},{"game_window_detected",game!=nullptr},{"manual_window",manualGame!=nullptr},{"overlay_enabled",settings.overlay},{"overlay_visible",IsWindowVisible(overlay)!=FALSE},{"telemetry_summary",current.summary()}};
- auto endpoint=[](const wt::Endpoint&e){wt::json j={{"received",e.received},{"status",e.status},{"fields",e.fields}};return j;};
+ wt::json report={{"version","0.4.1"},{"demo",settings.demo},{"game_window_detected",game!=nullptr},{"manual_window",manualGame!=nullptr},{"overlay_enabled",settings.overlay},{"overlay_visible",IsWindowVisible(overlay)!=FALSE},{"telemetry_summary",current.summary()},{"reported_vehicle",current.vehicle()}};
+ auto endpoint=[](const wt::Endpoint&e){wt::json j={{"received",e.received},{"status",e.status},{"fields",e.fields},{"army",e.army},{"vehicle_id",e.vehicleId}};return j;};
  report["state"]=endpoint(current.state);report["indicators"]=endpoint(current.indicators);report["map_info"]=endpoint(current.map);
  auto path=settingsPath.parent_path()/L"compatibility-report.json";std::ofstream f(path);f<<report.dump(2);if(!f){error="Cannot save compatibility report";return;}f.close();if(!f){error="Compatibility report write failed";return;}ShellExecuteW(control,L"open",settingsPath.parent_path().c_str(),nullptr,nullptr,SW_SHOWNORMAL);
  }catch(const std::exception&e){error=std::string("Report export failed: ")+e.what();}
