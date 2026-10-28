@@ -1,7 +1,7 @@
-Vehicle telemetry fix 0.4.1
+Shot Mk.3 stat-card update 0.5
 
-The indicators endpoint is now polled first. Valid tank model IDs are preserved even when the inspector's field limit is reached. The dashboard and overlay show the reported vehicle even if /state fails. The user-supplied tankModels/sw_charioteer_mk_7 response is covered by regression tests and displayed as Charioteer Mk VII (Sweden). Unknown tank model IDs are displayed verbatim; they are not guessed. Stale or invalid identities are cleared.
+Uses the supplied screenshot's 18 penetration values: 10, 100, 500, 1000, 1500 and 2000 m at 0, 30 and 60 degrees. Armour studio now interpolates this table against a user-entered nominal plate thickness. It refuses extrapolation and complex armour; the angle effect is not applied twice. Results are an approximate homogeneous-plate comparison, not a damage simulation.
 
-Exit the previous app, launch this executable, and click Connect to game. Ammunition remains manual: the supplied response contains no selected-shell identifier or penetration table. This update does not add enemy armour highlighting or verified armour data.
+The Charioteer is identified from the user-supplied indicators format even if /state fails. Ammunition selection remains manual. Selecting Shot Mk.3 APDS displays 385 mm at 10 m / 0 degrees in the overlay. This does not supply or detect enemy armour geometry.
 
-The user-supplied Shot Mk 3 / APDS / 381 mm profile is shown as manual ammunition, editable in Game connection. Distance and impact-angle conditions are unknown. It is not automatically detected and does not drive armour predictions.
+Exit the previous app, open this executable, and click Connect to game. Select Armour studio to use the supplied table.

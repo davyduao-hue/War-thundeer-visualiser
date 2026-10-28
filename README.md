@@ -79,3 +79,7 @@ Telemetry mode changes clear old data immediately, pending results from older mo
 The user-supplied Charioteer indicators response is included as a regression fixture. Its reported model ID is mapped to a display label; this is not a verified armour profile. Vehicle identity is read from the complete indicators JSON before limiting inspector rows. `/state` failure does not prevent identifying the vehicle. No selected ammunition identifier was present in the supplied response; `first_stage_ammo: -1` is not interpreted as a shell type.
 
 Manual ammunition controls in Game connection are seeded from the user-reported Shot Mk 3 APDS, 381 mm penetration. This is unverified user input with unknown distance/angle, persisted locally and displayed in the overlay; it is not an ammunition identification result or a ballistic model.
+
+## Shot Mk.3 stat-card table 0.5
+
+The later user-supplied screenshot specifies all 18 values at six ranges (10–2000 m) and three angles (0/30/60 degrees). These supersede the earlier condition-unknown scalar when Shot Mk.3 APDS is selected. Armour studio provides bilinear interpolation, with no extrapolation, and compares against user-entered nominal homogeneous-plate thickness. Angle effects are already in the table and are not applied twice. The +/-15% band is a heuristic, not a probability. Complex armour and damage remain unsupported. Source: user-supplied screenshot; game version and real-game outcomes are unverified.
