@@ -1,9 +1,13 @@
 #pragma once
 #include "core.hpp"
+#include <chrono>
+#include <mutex>
+#include <cstdint>
 namespace wt {
 // Parsing is independent of HTTP and game-window discovery. Missing endpoints must
 // not erase useful data from another endpoint. No fields imply shell identification.
 struct Endpoint {
+ std::chrono::steady_clock::time_point sampledAt=std::chrono::steady_clock::now();
  bool received=false;
  std::optional<bool> valid;
  std::string status="Not polled";
@@ -39,6 +43,26 @@ struct TelemetrySnapshot {
   if(simulated)return "SIMULATED telemetry";
   if(!connected())return "Telemetry disconnected: "+state.status;
   return "State: "+state.status+" | Indicators: "+indicators.status;
+ }
+};
+
+// A generation identifies each mode change, including live -> demo -> live.
+// Old worker results can never replace data from a newer request.
+class TelemetryChannel {
+ mutable std::mutex mutex;
+ TelemetrySnapshot snapshot;
+ bool mode=true;
+ std::uint64_t generation=1;
+public:
+ struct Request {bool simulated;std::uint64_t generation;};
+ TelemetryChannel(){snapshot.simulated=true;}
+ Request request()const{std::lock_guard lock(mutex);return {mode,generation};}
+ void setMode(bool value){std::lock_guard lock(mutex);if(mode==value)return;mode=value;++generation;snapshot={};snapshot.simulated=value;}
+ bool publish(Request request,TelemetrySnapshot value){std::lock_guard lock(mutex);if(request.generation!=generation)return false;value.simulated=mode;snapshot=std::move(value);return true;}
+ TelemetrySnapshot read(std::chrono::steady_clock::time_point now=std::chrono::steady_clock::now())const{
+  std::lock_guard lock(mutex);auto result=snapshot;
+  for(auto endpoint:{&result.state,&result.indicators,&result.map})if(endpoint->received&&now-endpoint->sampledAt>std::chrono::seconds(4)){endpoint->received=false;endpoint->valid.reset();endpoint->fields.clear();endpoint->status="Stale data - waiting for update";}
+  return result;
  }
 };
 }

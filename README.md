@@ -1,4 +1,4 @@
-# WT Armour Vision — research edition 0.3
+# WT Armour Vision — research edition 0.4
 
 Native C++20 Windows control centre, independent telemetry overlay and offline synthetic armour demonstration. This is an initial implementation, **not the complete production application described in the specification**. No verified War Thunder armour dataset, live weakspot analysis, damage prediction or vehicle recognition is included.
 
@@ -67,3 +67,9 @@ Fixed DirectX swap-chain resizing by unbinding the active render target before r
 Corrupt settings no longer apply partially or get silently overwritten. Reset settings explicitly replaces a rejected file; otherwise the original is preserved. Windows settings replacement is atomic. Corrupt database loading now falls back to bundled synthetic profiles while retaining the source file. Unicode telemetry and names preserve complete characters, and report export failures remain in the UI instead of terminating the application. Duplicate launches restore the existing window. Missing tray support falls back to the taskbar, and Explorer restarts re-register the tray icon.
 
 Regression coverage includes failed settings loads/replacements, UTF-8 boundaries, oversized JSON, negative penetration-table distances and database load rollback. Windows CI additionally tests recovery from corrupt settings and database files through application launch, rendering and shutdown. Real-game validation remains outstanding.
+
+## Interface redesign 0.4
+
+The native control centre now uses Segoe UI typography, a persistent sidebar, clear status cards, separate session controls, a telemetry inspector, selectable performance presets, and an armour studio with a grid-backed schematic and analysis panel. Overlay settings include a position preview; the profile page has reset confirmation; the data library has a searchable table. Existing connection, overlay, settings and database controls remain functional.
+
+Telemetry mode changes clear old data immediately, pending results from older modes are rejected, and data older than four seconds is marked stale. Each endpoint publishes independently so an unavailable map endpoint does not delay state display. The Windows smoke test renders every page. The release includes a captured UI preview.

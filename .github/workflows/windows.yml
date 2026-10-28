@@ -27,6 +27,13 @@ jobs:
           if ($LASTEXITCODE) { throw "Install failed" }
           Copy-Item package/WTArmourVision/WTArmourVision.exe WTArmourVision.exe
           Compress-Archive package/WTArmourVision/* WTArmourVision-Windows-x64.zip
+          Add-Type -AssemblyName System.Drawing
+          $preview = [System.Drawing.Image]::FromFile((Resolve-Path build/Release/ui-preview.bmp))
+          $preview.Save((Join-Path $pwd "UI-preview.png"), [System.Drawing.Imaging.ImageFormat]::Png)
+          $preview.Dispose()
+          $studio = [System.Drawing.Image]::FromFile((Resolve-Path build/Release/armour-preview.bmp))
+          $studio.Save((Join-Path $pwd "Armour-preview.png"), [System.Drawing.Imaging.ImageFormat]::Png)
+          $studio.Dispose()
           Get-FileHash WTArmourVision.exe -Algorithm SHA256 | Format-List | Out-File SHA256.txt
       - uses: actions/upload-artifact@v4
         with:
@@ -35,6 +42,8 @@ jobs:
             WTArmourVision.exe
             WTArmourVision-Windows-x64.zip
             SHA256.txt
+            UI-preview.png
+            Armour-preview.png
       - name: Publish GitHub release
         if: github.event_name != 'pull_request'
         shell: pwsh
@@ -42,5 +51,5 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           $tag = "build-${{ github.run_number }}-${{ github.run_attempt }}"
-          gh release create $tag WTArmourVision.exe WTArmourVision-Windows-x64.zip SHA256.txt --target '${{ github.sha }}' --title "WT Armour Vision $tag" --notes-file docs/RELEASE_NOTES.md --latest
+          gh release create $tag WTArmourVision.exe WTArmourVision-Windows-x64.zip SHA256.txt UI-preview.png Armour-preview.png --target '${{ github.sha }}' --title "WT Armour Vision $tag" --notes-file docs/RELEASE_NOTES.md --latest
           if ($LASTEXITCODE) { throw "Release publishing failed" }

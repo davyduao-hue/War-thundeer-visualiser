@@ -10,5 +10,10 @@ int main(){int n=0;auto check=[&](bool v){if(!v)throw std::runtime_error("check 
  s.indicators={};check(!s.connected());s.map=wt::parseEndpoint(R"({"map_min":[0,0]})");check(s.connected());check(s.map.fields.empty());
  s.simulated=true;check(s.summary().find("SIMULATED")!=std::string::npos);
  wt::json large;for(int i=0;i<100;++i)large[std::to_string(i)]=std::string(1000,'x');e=wt::parseEndpoint(large.dump());check(e.fields.size()==12);check(e.fields[0].second.size()==160);
+ wt::TelemetryChannel channel;auto demoRequest=channel.request();check(demoRequest.simulated);
+ wt::TelemetrySnapshot sample;sample.state=wt::parseEndpoint(R"({"valid":true,"speed":42})");check(channel.publish(demoRequest,sample));check(channel.read().connected());
+ channel.setMode(false);check(!channel.read().connected());check(!channel.publish(demoRequest,sample));auto liveRequest=channel.request();
+ channel.setMode(true);channel.setMode(false);check(!channel.publish(liveRequest,sample));liveRequest=channel.request();check(channel.publish(liveRequest,sample));check(!channel.read().simulated);
+ auto stale=channel.read(sample.state.sampledAt+std::chrono::seconds(5));check(!stale.connected());check(stale.state.fields.empty());check(!stale.state.valid);check(channel.read(sample.state.sampledAt+std::chrono::seconds(3)).connected());
  std::cout<<n<<" telemetry checks passed\n";return 0;
  }catch(const std::exception&e){std::cerr<<e.what()<<'\n';return 1;}}

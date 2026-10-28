@@ -1,9 +1,10 @@
-Bug-fix update 0.3:
-- Settings load transactionally: malformed files cannot partially change the running configuration.
-- Settings replacement is atomic on Windows; corrupt settings are preserved until Reset settings is selected.
-- Unicode names and telemetry are truncated at character boundaries; report export handles errors without terminating the app.
-- A corrupt database falls back to the embedded, clearly labelled synthetic profiles without overwriting the damaged file.
-- Launching the application twice restores the existing instance; unavailable tray support minimises to the taskbar, and Explorer restart re-registers the tray icon.
-- Shutdown cleans up even if saving settings fails.
+Interface redesign 0.4:
+- New native sidebar, typography, dark panels, status cards and clear session controls.
+- Dedicated armour studio, telemetry inspector, performance presets, overlay preview and searchable data library.
+- Profile settings now include reset confirmation.
+- Demo/live switches clear old telemetry immediately; obsolete worker results are rejected and stale readings are hidden.
+- Endpoint results appear independently rather than waiting for all three requests.
 
-Download WTArmourVision.exe for Windows x64. No developer tools or additional demo data files are needed. Click CONNECT TO GAME; use borderless mode and manually choose the game window if needed. Real War Thunder compatibility remains unverified. No live armour detection, weakspot targeting, automatic ammunition selection or validated damage prediction is included.
+Download WTArmourVision.exe and double-click it. The embedded demo database requires no extra files. UI-preview.png shows the Windows interface. Windows automated tests render all seven pages, resize and shut down, and exercise corrupt-file recovery.
+
+Real War Thunder compatibility remains unverified. No live armour detection, automatic ammunition selection, weakspot targeting or validated damage prediction is included. Bundled profiles are synthetic and labelled accordingly.
