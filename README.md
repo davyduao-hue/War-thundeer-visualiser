@@ -77,3 +77,5 @@ Telemetry mode changes clear old data immediately, pending results from older mo
 ## Vehicle identification 0.4.1
 
 The user-supplied Charioteer indicators response is included as a regression fixture. Its reported model ID is mapped to a display label; this is not a verified armour profile. Vehicle identity is read from the complete indicators JSON before limiting inspector rows. `/state` failure does not prevent identifying the vehicle. No selected ammunition identifier was present in the supplied response; `first_stage_ammo: -1` is not interpreted as a shell type.
+
+Manual ammunition controls in Game connection are seeded from the user-reported Shot Mk 3 APDS, 381 mm penetration. This is unverified user input with unknown distance/angle, persisted locally and displayed in the overlay; it is not an ammunition identification result or a ballistic model.

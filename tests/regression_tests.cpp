@@ -21,5 +21,6 @@ int main(){int n=0;auto check=[&](bool v){if(!v)throw std::runtime_error("Regres
  check(e.fields[0].first.size()==79);check(e.fields[0].second.size()==159);check(!fails([&]{auto out=wt::json(e.fields).dump();}));
  wt::Shell shell{"test","AP",{{-.5,100},{100,90}},0,70,true};wt::Plate plate{"test",50,0,false,true};check(wt::analyze(shell,plate,0).classification==wt::Class::Uncertain);
  wt::Database db;db.version="preserved";check(fails([&]{db.loadJson(wt::json{{"schema",1},{"version","new"},{"plates",wt::json::array()},{"shells",wt::json::array()}});}));check(db.version=="preserved");
+ settings.manualPenetration=381;std::snprintf(settings.manualShell,sizeof settings.manualShell,"Shot Mk 3");settings.save(path);loaded.load(path);check(loaded.manualPenetration==381);check(std::string(loaded.manualShell)=="Shot Mk 3");write(R"({"manual_penetration":-1})");check(fails([&]{loaded.load(path);}));check(loaded.manualPenetration==381);
  std::filesystem::remove_all(dir);std::cout<<n<<" regression checks passed\n";return 0;
  }catch(const std::exception&e){std::filesystem::remove_all(dir);std::cerr<<e.what()<<'\n';return 1;}}

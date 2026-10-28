@@ -74,11 +74,15 @@ struct Database {
  }
 };
 struct Settings {
+ char manualShell[96]="Shot Mk 3";char manualShellType[24]="APDS";float manualPenetration=381;
  bool overlay=false,demo=true;int preset=1,fps=30;float opacity=.85f,scale=1;char name[64]="Commander";
  void load(const std::filesystem::path& p){
   std::ifstream f(p);if(!f){if(std::filesystem::exists(p))throw std::runtime_error("Cannot read settings");return;}
   auto j=readJson(f,65536);if(!j.is_object())throw std::runtime_error("Settings must be a JSON object");
   Settings next;
+  auto shell=utf8Prefix(j.value("manual_shell",std::string("Shot Mk 3")),95);auto type=utf8Prefix(j.value("manual_shell_type",std::string("APDS")),23);
+  std::snprintf(next.manualShell,sizeof next.manualShell,"%s",shell.c_str());std::snprintf(next.manualShellType,sizeof next.manualShellType,"%s",type.c_str());
+  next.manualPenetration=j.value("manual_penetration",381.f);if(!std::isfinite(next.manualPenetration)||next.manualPenetration<0||next.manualPenetration>5000)throw std::runtime_error("Invalid manual penetration");
   next.overlay=j.value("overlay",false);next.demo=j.value("demo",true);
   next.preset=std::clamp(j.value("preset",1),0,2);next.fps=std::clamp(j.value("fps",30),10,60);
   next.opacity=std::clamp(j.value("opacity",.85f),.1f,1.f);next.scale=std::clamp(j.value("scale",1.f),.5f,2.f);
@@ -88,7 +92,7 @@ struct Settings {
  }
  void save(const std::filesystem::path& p)const{
   // Serialize before touching disk so invalid input cannot damage a saved file.
-  auto content=json{{"overlay",overlay},{"demo",demo},{"preset",preset},{"fps",fps},{"opacity",opacity},{"scale",scale},{"name",name}}.dump(2);
+  auto content=json{{"manual_shell",manualShell},{"manual_shell_type",manualShellType},{"manual_penetration",manualPenetration},{"overlay",overlay},{"demo",demo},{"preset",preset},{"fps",fps},{"opacity",opacity},{"scale",scale},{"name",name}}.dump(2);
   auto temp=p;temp+=".tmp";
   try{
    {std::ofstream f(temp,std::ios::binary|std::ios::trunc);if(!f)throw std::runtime_error("Cannot save settings");f<<content;f.close();if(!f)throw std::runtime_error("Settings write failed");}
