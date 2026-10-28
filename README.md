@@ -1,4 +1,4 @@
-# WT Armour Vision — research edition 0.1
+# WT Armour Vision — research edition 0.2
 
 Native C++20 Windows control centre, independent telemetry overlay and offline synthetic armour demonstration. This is an initial implementation, **not the complete production application described in the specification**. No verified War Thunder armour dataset, live weakspot analysis, damage prediction or vehicle recognition is included.
 
@@ -30,11 +30,11 @@ ctest --test-dir build --output-on-failure
 
 ## Operation
 
-Demo mode starts enabled and labels simulated telemetry. Enable the overlay on Dashboard; demo overlay follows the control window. Disable demo to use War Thunder's loopback port 8111. Overlay supports a visible, focused `aces.exe` window in borderless mode. It hides on focus loss, minimisation or game exit. It is a separate layered, nonactivating, click-through Win32 window with GDI text; the control centre uses Dear ImGui and DirectX 11. Exclusive fullscreen is unsupported.
+Demo mode starts enabled and labels simulated telemetry. Enable the overlay on Dashboard; demo overlay follows the control window. Click **CONNECT TO GAME** to disable demo and enable the overlay. In Game Settings, refresh the window list and select the game if automatic detection fails. Telemetry polls port 8111 independently of window detection. Overlay supports a visible, focused `aces.exe` window in borderless mode. It hides on focus loss, minimisation or game exit. It is a separate layered, nonactivating, click-through Win32 window with GDI text; the control centre uses Dear ImGui and DirectX 11. Exclusive fullscreen is unsupported.
 
 Alt+F8 toggles the overlay when hotkey registration succeeds. Minimise to tray from User Settings; double-click the tray icon to restore and right-click to exit. Settings persist under `%LOCALAPPDATA%/WTArmourVision/settings.json` every two seconds and at normal shutdown. Copy this file to back up settings; there is no GUI import/export yet.
 
-Telemetry is read asynchronously from `/state`, `/indicators`, `/map_info.json` with bounded responses, timeouts and reconnect polling. Endpoint availability and fields in ground battles are **not verified**. A reported `type` is displayed as unverified raw information. Ammunition detection is not implemented: `MANUAL SHELL SELECTION REQUIRED` remains visible. No targets or precise armour maps are derived from live telemetry.
+Telemetry is read asynchronously from `/state`, `/indicators`, `/map_info.json` with bounded responses, timeouts and reconnect polling. Endpoint availability and fields in ground battles are **not verified**. A reported `type` is displayed as unverified raw information. Ammunition detection is not implemented: `MANUAL SHELL SELECTION REQUIRED` remains visible. No targets or precise armour maps are derived from live telemetry. Each endpoint is polled independently; one missing endpoint no longer prevents the others from working. Raw fields retain their provided labels/units. **Save compatibility report** writes `compatibility-report.json` under the application settings folder and opens that folder.
 
 ## Offline analysis
 
@@ -48,12 +48,16 @@ Legend: red #FF4545 unlikely; green #36E886 likely; yellow #FFD447 uncertain. Bl
 
 Implemented: seven control pages, actual overlay toggle/opacity/scale/FPS control, process/window discovery using limited query access, focus tracking, telemetry worker, manual shell/profile selection, local database reload/search, local display name/settings, tray/hotkey, synthetic plate viewer, portable calculation tests, Windows build/package workflow.
 
-Outstanding: verified licensed vehicle data and geometry, online database updates, validated shell-specific ballistics and damage models, full vehicle 3D rendering, optional recorded-video CV/tracking, CPU profiling and RX 580 benchmarks, manual game-window selection, anchors/colour customization, avatars/localization, Windows autostart, notifications, GUI settings import/export, adaptive video throttling. Performance presets currently alter telemetry polling and render caps only. No game FPS impact has been measured.
+Outstanding: verified licensed vehicle data and geometry, online database updates, validated shell-specific ballistics and damage models, full vehicle 3D rendering, optional recorded-video CV/tracking, CPU profiling and RX 580 benchmarks, anchors/colour customization, avatars/localization, Windows autostart, notifications, GUI settings import/export, adaptive video throttling. Performance presets currently alter telemetry polling and render caps only. No game FPS impact has been measured.
 
 ## Validation status
 
-Linux: 17 core checks passed, including interpolation, classification thresholds, LOS, invalid angle/range, complex armour uncertainty, HE/APFSDS limitations, unverified data, database loading and settings replacement.
+Linux: 17 core checks and 19 telemetry parsing/recovery checks passed, including interpolation, classification thresholds, LOS, invalid angle/range, complex armour uncertainty, HE/APFSDS limitations, unverified data, database loading and settings replacement.
 
 Windows launch, DX11 rendering, tray, transparency, click-through, resizing, DPI, shutdown and real game reconnection require Windows execution. Follow `docs/WINDOWS_CHECKLIST.md`. A Windows x64 executable was cross-compiled with LLVM-MinGW 20250613 (Clang 20.1.7) on Linux. It has not been executed on Windows or tested with War Thunder.
 
 See `docs/RESEARCH.md` for research/access limitations and `ATTRIBUTION.md` for data and dependency licensing.
+
+## Compatibility update 0.2
+
+Fixed DirectX swap-chain resizing by unbinding the active render target before releasing it. Added manual game window selection, independent telemetry polling, endpoint-specific errors, bounded response reads, display-DPI overlay sizing, and a compatibility report. The Windows build workflow now runs `WTArmourVision.exe --smoke-test`, which uses software rendering to create the windows, render frames, resize, check overlay style flags, save settings and shut down. This automation does not verify visual transparency, input routing or actual War Thunder compatibility. Live validation on a Windows PC remains required.

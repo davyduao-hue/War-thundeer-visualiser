@@ -1,4 +1,6 @@
-# Required Windows validation — NOT EXECUTED
+# Required Windows validation
+
+Automated launch/resize/style/shutdown smoke coverage is registered in CTest for Windows. It has not been run on the Linux development host. The following real-game and interactive checks remain unverified.
 
 1. Build Release x64 with VS2022; run CTest; install to package directory.
 2. Launch packaged executable from Explorer with no developer tools on PATH.
