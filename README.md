@@ -1,4 +1,4 @@
-# WT Armour Vision — research edition 0.2
+# WT Armour Vision — research edition 0.3
 
 Native C++20 Windows control centre, independent telemetry overlay and offline synthetic armour demonstration. This is an initial implementation, **not the complete production application described in the specification**. No verified War Thunder armour dataset, live weakspot analysis, damage prediction or vehicle recognition is included.
 
@@ -61,3 +61,9 @@ See `docs/RESEARCH.md` for research/access limitations and `ATTRIBUTION.md` for 
 ## Compatibility update 0.2
 
 Fixed DirectX swap-chain resizing by unbinding the active render target before releasing it. Added manual game window selection, independent telemetry polling, endpoint-specific errors, bounded response reads, display-DPI overlay sizing, and a compatibility report. The Windows build workflow now runs `WTArmourVision.exe --smoke-test`, which uses software rendering to create the windows, render frames, resize, check overlay style flags, save settings and shut down. This automation does not verify visual transparency, input routing or actual War Thunder compatibility. Live validation on a Windows PC remains required.
+
+## Bug-fix update 0.3
+
+Corrupt settings no longer apply partially or get silently overwritten. Reset settings explicitly replaces a rejected file; otherwise the original is preserved. Windows settings replacement is atomic. Corrupt database loading now falls back to bundled synthetic profiles while retaining the source file. Unicode telemetry and names preserve complete characters, and report export failures remain in the UI instead of terminating the application. Duplicate launches restore the existing window. Missing tray support falls back to the taskbar, and Explorer restarts re-register the tray icon.
+
+Regression coverage includes failed settings loads/replacements, UTF-8 boundaries, oversized JSON, negative penetration-table distances and database load rollback. Windows CI additionally tests recovery from corrupt settings and database files through application launch, rendering and shutdown. Real-game validation remains outstanding.

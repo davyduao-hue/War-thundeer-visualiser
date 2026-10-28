@@ -26,7 +26,7 @@ inline Endpoint parseEndpoint(const std::string& body) {
    if(it.value().is_number()||it.value().is_boolean()||it.value().is_string()){
     auto value=it.value().is_string()?it.value().get<std::string>():it.value().dump();
     // Bounds keep UI/report size predictable; labels and units stay as provided.
-    e.fields.emplace_back(it.key().substr(0,80),value.substr(0,160));
+    e.fields.emplace_back(utf8Prefix(it.key(),80),utf8Prefix(value,160));
    }
   }
  }catch(const json::exception&){e.status="Malformed JSON";}
